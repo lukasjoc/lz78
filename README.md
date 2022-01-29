@@ -1,2 +1,4 @@
 # lz78
-LZ78 compression
+
+> LZ78 compression (Simplified)
+
