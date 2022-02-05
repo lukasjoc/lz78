@@ -2,8 +2,8 @@
 LZ78 compression (Simplified)
 
 """
-
 from dataclasses import dataclass
+import sys
 
 # The `Chunk` Type for a given pair
 
@@ -28,8 +28,8 @@ def encoder(phrase):
         if not temp in ddk:
             index += 1
             c = Chunk(ref=ddk.index(mem),
-                      frag=temp[len(temp) - 1],
-                      index=index)
+                    frag=temp[len(temp) - 1],
+                    index=index)
 
             dd[temp] = c
             o += str(c.ref) + c.frag
@@ -43,51 +43,42 @@ def encoder(phrase):
 
     return o
 
-
 def decoder(phrase):
     index = 0
     dd = {"": Chunk(ref=0, frag="", index=index)}
     o = ""
-    ap = ""
-    ip = ""
+    temp = ""
+
+    def get_frag_by_ref(ref, f=""):
+        for _, value in dd.items():
+            if str(value.index) == str(ref):
+                f = value.frag + f
+                if (len(str(value.ref)) > 0
+                    and int(value.ref) > 0):
+                    return get_frag_by_ref(str(value.ref), f)
+        return f
 
     for l in phrase:
-        ddk = list(dd.keys())
-        if l.isnumeric():
-            ip += l
-        else:
+        temp += l
+        ddk = (list(dd.keys()) + [str(c.ref) for c in dd.values()]
+                              + [str(c.index) for c in dd.values()])
+        if not temp in ddk:
             index += 1
-            ap += l
+            index_len = len(str(index))
+            if index_len >= len(temp):
+                index_len = len(temp) - 1
+            c = Chunk(ref=temp[:index_len],
+                    frag=temp[len(temp) - 1],
+                    index=index)
+            dd[temp] = c
+            o += get_frag_by_ref(c.ref) + c.frag
+            temp = ""
 
-            ap = str(ddk[int(ip)]) + ap if int(ip) > 0 else ap
-            c = Chunk(ref=int(ip),
-                      frag=str(ap),
-                      index=index)
-
-            dd[ap] = c
-            o += ap
-            ip = ""
-            ap = ""
-
-    if(len(ip) > 0):
-        o += ddk[int(ip)]
-
+    if len(temp) > 0:
+        a = get_frag_by_ref("3")
+        for _, value in dd.items():
+            if str(value.index) == str(temp):
+                o += get_frag_by_ref(value.index)
     return o
 
 
-if __name__ == "__main__":
-    assert encoder('ABAABABAABAB') == '0A0B1A2A4A4B'
-    assert encoder('ABAABABAABABAA') == '0A0B1A2A4A4B3'
-    assert encoder('ABBCBCABABCAABCAABBCAA') == '0A0B2C3A2A4A6B6'
-    assert encoder('AAAAAAAAAAAAAAA') == '0A1A2A3A4A'
-    assert encoder('ABCABCABCABCABCABC') == '0A0B0C1B3A2C4C7A6'
-    assert encoder(
-        'ABCDDEFGABCDEDBBDEAAEDAEDCDABC') == '0A0B0C0D4E0F0G1B3D0E4B2D10A1E4A10D9A2C'
-
-    assert decoder('0A0B1A2A4A4B') == 'ABAABABAABAB'
-    assert decoder('0A0B1A2A4A4B3') == 'ABAABABAABABAA'
-    assert decoder('0A0B2C3A2A4A6B6') == 'ABBCBCABABCAABCAABBCAA'
-    assert decoder('0A1A2A3A4A') == 'AAAAAAAAAAAAAAA'
-    assert decoder('0A0B0C1B3A2C4C7A6') == 'ABCABCABCABCABCABC'
-    assert decoder(
-        '0A0B0C0D4E0F0G1B3D0E4B2D10A1E4A10D9A2C') == 'ABCDDEFGABCDEDBBDEAAEDAEDCDABC'

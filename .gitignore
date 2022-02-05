@@ -3,3 +3,8 @@
 .netrwhist
 .DS_Store
 tags
+nietzsche
+*.lz78
+__pycache__/
+
+hello_world
