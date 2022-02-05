@@ -4,4 +4,7 @@
 .DS_Store
 tags
 nietzsche
-nietzsche.lz78
+*.lz78
+__pycache__/
+
+hello_world
