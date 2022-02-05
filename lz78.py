@@ -2,8 +2,6 @@
 LZ78 compression (Simplified)
 
 """
-
-from pprint import pprint
 from dataclasses import dataclass
 import sys
 
@@ -55,7 +53,6 @@ def decoder(phrase):
         for _, value in dd.items():
             if str(value.index) == str(ref):
                 f = value.frag + f
-                print(value.ref)
                 if (len(str(value.ref)) > 0
                     and int(value.ref) > 0):
                     return get_frag_by_ref(str(value.ref), f)
@@ -76,7 +73,6 @@ def decoder(phrase):
             dd[temp] = c
             o += get_frag_by_ref(c.ref) + c.frag
             temp = ""
-        # pprint(dd, sort_dicts=False)
 
     if len(temp) > 0:
         a = get_frag_by_ref("3")
