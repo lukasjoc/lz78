@@ -50,13 +50,14 @@ def decoder(phrase):
     dd = {"": Chunk(ref=0, frag="", index=index)}
     o = ""
     temp = ""
-    mem = ""
 
     def get_frag_by_ref(ref, f=""):
         for _, value in dd.items():
             if str(value.index) == str(ref):
                 f = value.frag + f
-                if int(value.ref) > 0:
+                print(value.ref)
+                if (len(str(value.ref)) > 0
+                    and int(value.ref) > 0):
                     return get_frag_by_ref(str(value.ref), f)
         return f
 
@@ -66,25 +67,22 @@ def decoder(phrase):
                               + [str(c.index) for c in dd.values()])
         if not temp in ddk:
             index += 1
-            c = Chunk(ref=temp[:len(str(index))],
+            index_len = len(str(index))
+            if index_len >= len(temp):
+                index_len = len(temp) - 1
+            c = Chunk(ref=temp[:index_len],
                     frag=temp[len(temp) - 1],
                     index=index)
             dd[temp] = c
             o += get_frag_by_ref(c.ref) + c.frag
-
-            temp, mem = "", ""
-
-        mem = temp
+            temp = ""
+        # pprint(dd, sort_dicts=False)
 
     if len(temp) > 0:
-
         a = get_frag_by_ref("3")
         for _, value in dd.items():
             if str(value.index) == str(temp):
                 o += get_frag_by_ref(value.index)
-
-    pprint(dd, sort_dicts=False)
-    print(o)
     return o
 
 
