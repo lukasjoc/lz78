@@ -1,4 +1,4 @@
 # lz78
 
-> LZ78 compression (Simplified)
+> Some sort of LZ78 Compression
 
